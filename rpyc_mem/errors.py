@@ -17,3 +17,11 @@ class RpycMemSvcError(BaseRpycMemError):
         super().__init__(
             message or 'An unspecified error occurred in RpycMemService'
         )
+
+
+class RpycMemConnError(BaseRpycMemError):
+    """Error associated to Rpyc memory connection"""
+    def __init__(self, message=None):
+        super().__init__(
+            message or 'An unspecified error occurred in RpycMemConnect'
+        )
