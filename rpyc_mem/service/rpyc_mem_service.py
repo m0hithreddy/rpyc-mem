@@ -31,6 +31,7 @@ class RpycMemService(rpyc.Service):
 
         self._hostname = hostname
         self._port = port
+        self._server_obj = None
 
     def run(self, server=None, server_kwargs=None):
         """
@@ -62,7 +63,8 @@ class RpycMemService(rpyc.Service):
         if server_kwargs:
             kwargs.update(server_kwargs)
 
-        server(**kwargs).start()
+        self._server_obj = server(**kwargs)
+        self._server_obj.start()
 
     @classmethod
     def memoize(cls, unique_key, robj=DEFAULT, robj_gen=DEFAULT):
