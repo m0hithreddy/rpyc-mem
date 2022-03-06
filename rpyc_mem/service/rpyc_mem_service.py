@@ -4,6 +4,7 @@ import threading
 from importlib import import_module
 
 import rpyc
+from rpyc.utils.server import ThreadedServer
 
 from rpyc_mem.errors import RpycMemSvcError
 
@@ -21,6 +22,42 @@ class RpycMemService(rpyc.Service):
 
     _memoize_lock = threading.Lock()
     _sharedmem = dict()
+
+    def __init__(self, hostname=None, port=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._hostname = hostname
+        self._port = port
+
+    def run(self, server=None, server_kwargs=None):
+        """
+        Run the RPyC memory service. The host and port used are picked from the __init__ configuration.
+        By default ThreadingServer is used, however this can be altered by passing different 'server' and
+        associated 'server_kwargs'.
+
+        :param server:
+        :param server_kwargs:
+        :return:
+        """
+        if not server:
+            server = ThreadedServer
+
+        kwargs = {
+            'service': self.__class__,
+            'protocol_config': {
+                'allow_all_attrs': True
+            }
+        }
+        if self._hostname:
+            kwargs['hostname'] = self._hostname
+
+        if self._port:
+            kwargs['port'] = self._port
+
+        if server_kwargs:
+            kwargs.update(server_kwargs)
+
+        server(**kwargs).start()
 
     @classmethod
     def memoize(cls, unique_key, robj=DEFAULT, robj_gen=DEFAULT):
