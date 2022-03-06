@@ -18,6 +18,9 @@ class RpycMemService(rpyc.Service):
     one snapshot of the memory
     """
 
+    ALLOWED_GET_ATTRS = [
+        'memoize', 'get', 'update', 'is_memoized', 'remote_import', 'rpyc_version'
+    ]
     DEFAULT = object()
 
     _memoize_lock = threading.Lock()
@@ -163,3 +166,30 @@ class RpycMemService(rpyc.Service):
             return False
 
         return True
+
+    def _rpyc_getattr(self, name):
+        """RPyC get attribute"""
+        if name in self.ALLOWED_GET_ATTRS:
+            return getattr(self, name)
+
+        raise AttributeError(
+            "'%s' object has no attribute '%s'" % (self.__class__.__name__, name)
+        )
+
+    def _rpyc_setattr(self, name, value):
+        """RPyC set attribute"""
+        if name in self.ALLOWED_GET_ATTRS:
+            raise AttributeError('access denied')
+
+        raise AttributeError(
+            "'%s' object has no attribute '%s'" % (self.__class__.__name__, name)
+        )
+
+    def _rpyc_delattr(self, name):
+        """RPyC delete attribute"""
+        if name in self.ALLOWED_GET_ATTRS:
+            raise AttributeError('access denied')
+
+        raise AttributeError(
+            "'%s' object has no attribute '%s'" % (self.__class__.__name__, name)
+        )
