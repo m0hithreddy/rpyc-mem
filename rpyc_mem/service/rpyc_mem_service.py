@@ -45,7 +45,9 @@ class RpycMemService(rpyc.Service):
         kwargs = {
             'service': self.__class__,
             'protocol_config': {
-                'allow_all_attrs': True
+                'allow_all_attrs': True,
+                'allow_setattr': True,
+                'allow_delattr': True
             }
         }
         if self._hostname:
