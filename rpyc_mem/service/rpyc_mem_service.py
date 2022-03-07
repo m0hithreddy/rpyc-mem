@@ -18,10 +18,10 @@ class RpycMemService(rpyc.Service):
     one snapshot of the memory
     """
 
-    ALLOWED_GET_ATTRS = [
+    _ALLOWED_GET_ATTRS = [
         'memoize', 'get', 'update', 'is_memoized', 'remote_import', 'rpyc_version'
     ]
-    DEFAULT = object()
+    _DEFAULT = object()
 
     _memoize_lock = threading.Lock()
     _sharedmem = dict()
@@ -67,7 +67,7 @@ class RpycMemService(rpyc.Service):
         self._server_obj.start()
 
     @classmethod
-    def memoize(cls, unique_key, robj=DEFAULT, robj_gen=DEFAULT):
+    def memoize(cls, unique_key, robj=_DEFAULT, robj_gen=_DEFAULT):
         """
         Memoize the remote object or remote object returned by the generator against the unique_key
 
@@ -81,7 +81,7 @@ class RpycMemService(rpyc.Service):
 
         with cls._memoize_lock:
             if unique_key not in cls._sharedmem:
-                if robj is not cls.DEFAULT:
+                if robj is not cls._DEFAULT:
                     cls._sharedmem[unique_key] = robj
                 else:
                     cls._sharedmem[unique_key] = robj_gen() # noqa
@@ -103,7 +103,7 @@ class RpycMemService(rpyc.Service):
             return cls._sharedmem[unique_key]
 
     @classmethod
-    def update(cls, unique_key, robj=DEFAULT, robj_gen=DEFAULT):
+    def update(cls, unique_key, robj=_DEFAULT, robj_gen=_DEFAULT):
         """
         Update the remote object or remote object returned by the generator against the unique_key (create
         one if it doesnt exist)
@@ -117,7 +117,7 @@ class RpycMemService(rpyc.Service):
             raise RpycMemSvcError('Either object or object generator should be passed')
 
         with cls._memoize_lock:
-            if robj is not cls.DEFAULT:
+            if robj is not cls._DEFAULT:
                 cls._sharedmem[unique_key] = robj
             else:
                 cls._sharedmem[unique_key] = robj_gen() # noqa
@@ -163,15 +163,15 @@ class RpycMemService(rpyc.Service):
         :param robj_gen:
         :return:
         """
-        if (robj is cls.DEFAULT and robj_gen is cls.DEFAULT) or \
-                (robj is not cls.DEFAULT and robj_gen is not cls.DEFAULT):
+        if (robj is cls._DEFAULT and robj_gen is cls._DEFAULT) or \
+                (robj is not cls._DEFAULT and robj_gen is not cls._DEFAULT):
             return False
 
         return True
 
     def _rpyc_getattr(self, name):
         """RPyC get attribute"""
-        if name in self.ALLOWED_GET_ATTRS:
+        if name in self._ALLOWED_GET_ATTRS:
             return getattr(self, name)
 
         raise AttributeError(
@@ -180,7 +180,7 @@ class RpycMemService(rpyc.Service):
 
     def _rpyc_setattr(self, name, value):
         """RPyC set attribute"""
-        if name in self.ALLOWED_GET_ATTRS:
+        if name in self._ALLOWED_GET_ATTRS:
             raise AttributeError('access denied')
 
         raise AttributeError(
@@ -189,7 +189,7 @@ class RpycMemService(rpyc.Service):
 
     def _rpyc_delattr(self, name):
         """RPyC delete attribute"""
-        if name in self.ALLOWED_GET_ATTRS:
+        if name in self._ALLOWED_GET_ATTRS:
             raise AttributeError('access denied')
 
         raise AttributeError(
