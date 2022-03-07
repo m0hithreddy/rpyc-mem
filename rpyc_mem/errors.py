@@ -25,3 +25,11 @@ class RpycMemConnError(BaseRpycMemError):
         super().__init__(
             message or 'An unspecified error occurred in RpycMemConnect'
         )
+
+
+class RpycMemError(BaseRpycMemError):
+    """Error associated to Rpyc memory object"""
+    def __init__(self, message=None):
+        super().__init__(
+            message or 'An unspecified error occurred in RpycMem'
+        )
