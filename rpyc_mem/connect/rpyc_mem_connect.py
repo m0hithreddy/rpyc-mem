@@ -14,7 +14,8 @@ class RpycMemConnect:
     """
 
     _ROOT_ATTRS = [
-        'memoize', 'get', 'update', 'is_memoized', 'remote_import', 'rpyc_version'
+        'memoize', 'get', 'update', 'delete', 'is_memoized', 'remote_import',
+        'rpyc_version'
     ]
     _RMEM_CONN_ERROR = RpycMemConnError('Unable to connect to RPyC memory service')
 

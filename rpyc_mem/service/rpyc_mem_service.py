@@ -19,7 +19,8 @@ class RpycMemService(rpyc.Service):
     """
 
     _ALLOWED_GET_ATTRS = [
-        'memoize', 'get', 'update', 'is_memoized', 'remote_import', 'rpyc_version'
+        'memoize', 'get', 'update', 'delete', 'is_memoized', 'remote_import',
+        'rpyc_version'
     ]
     _DEFAULT = object()
 
@@ -123,6 +124,21 @@ class RpycMemService(rpyc.Service):
                 cls._sharedmem[unique_key] = robj_gen() # noqa
 
             return cls._sharedmem[unique_key]
+
+    @classmethod
+    def delete(cls, unique_key):
+        """
+        Delete the key mapping. Raise an exception if the key is not present
+
+        :param unique_key:
+        :return:
+        """
+
+        with cls._memoize_lock:
+            if unique_key not in cls._sharedmem:
+                raise RpycMemSvcError('No remote object exists against the key')
+
+            del cls._sharedmem[unique_key]
 
     @classmethod
     def is_memoized(cls, unique_key):
