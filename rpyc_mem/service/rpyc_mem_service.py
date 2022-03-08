@@ -14,8 +14,8 @@ class RpycMemService(rpyc.Service):
     RPyC memory service provides functionality to create named and unnamed python objects on remote
     hosts (one which runs this service). The remote objects are created using remote modules (see
     remote_import). By default all objects created are unnamed, they can be mapped against unique_key
-    to make them named. This service is intended to be run with 'rpyc.server.ThreadingServer' to maintain
-    one snapshot of the memory
+    to make them named. named objects can be managed using unique_key. This service is intended to be
+    run with 'rpyc.server.ThreadingServer' to maintain one snapshot of the memory
     """
 
     _ALLOWED_GET_ATTRS = [
@@ -28,6 +28,15 @@ class RpycMemService(rpyc.Service):
     _sharedmem = dict()
 
     def __init__(self, hostname=None, port=None, *args, **kwargs):
+        """
+        Initialize Rpyc memory service
+
+        :param str hostname: Hostname on which the service is run. Runs on '0.0.0.0' by default.
+        :param int port: Port on which the service is run. Picks a random by default. Can be queried back
+         with 'self._server_obj.port'
+        :param args: Left for rpyc during Service initialization
+        :param kwargs: Left for rpyc during Service initialization
+        """
         super().__init__(*args, **kwargs)
 
         self._hostname = hostname
@@ -70,11 +79,14 @@ class RpycMemService(rpyc.Service):
     @classmethod
     def memoize(cls, unique_key, robj=_DEFAULT, robj_gen=_DEFAULT):
         """
-        Memoize the remote object or remote object returned by the generator against the unique_key
+        Memoize the mapping with remote object or remote object returned by the generator against
+        the unique_key
 
-        :param unique_key:
-        :param robj:
-        :param robj_gen:
+        :param unique_key: The unique_key for creating/querying the mapping
+        :param typing.Any robj: The remote object for memoization (One among robj, robj_gen should be
+         passed)
+        :param typing.Callable robj_gen: The remote object generator for memoization (One among robj,
+         robj_gen should be passed)
         :return:
         """
         if not cls._validate_obj_sources(robj, robj_gen):
@@ -92,9 +104,9 @@ class RpycMemService(rpyc.Service):
     @classmethod
     def get(cls, unique_key):
         """
-        Get the remote object against the unique_key. Raise an exception if the key is not present
+        Get the remote object against the unique_key. Raise an exception if the mapping is not present
 
-        :param unique_key:
+        :param unique_key: The unique_key for querying the mapping
         :return:
         """
         with cls._memoize_lock:
@@ -106,12 +118,13 @@ class RpycMemService(rpyc.Service):
     @classmethod
     def update(cls, unique_key, robj=_DEFAULT, robj_gen=_DEFAULT):
         """
-        Update the remote object or remote object returned by the generator against the unique_key (create
-        one if it doesnt exist)
+        Update the mapping with the remote object or remote object returned by the generator against
+        the unique_key (create new mapping if it doesnt exist)
 
-        :param unique_key:
-        :param robj:
-        :param robj_gen:
+        :param unique_key: The unique_key for updating the mapping
+        :param typing.Any robj: The remote object for update (One among robj, robj_gen should be passed)
+        :param typing.Callable robj_gen: The remote object generator for update (One among robj, robj_gen
+         should be passed)
         :return:
         """
         if not cls._validate_obj_sources(robj, robj_gen):
@@ -128,9 +141,9 @@ class RpycMemService(rpyc.Service):
     @classmethod
     def delete(cls, unique_key):
         """
-        Delete the key mapping. Raise an exception if the key is not present
+        Delete the mapping against the unique_key. Raise an exception if the mapping is not present
 
-        :param unique_key:
+        :param unique_key: The unique_key for deleting the mapping
         :return:
         """
 
@@ -143,9 +156,9 @@ class RpycMemService(rpyc.Service):
     @classmethod
     def is_memoized(cls, unique_key):
         """
-        Return True if a remote object exists against the unique_key
+        Return True if a mapping exists against the unique_key
 
-        :param unique_key:
+        :param unique_key: The unique_key for querying the mapping
         :return:
         """
         with cls._memoize_lock:
@@ -156,16 +169,18 @@ class RpycMemService(rpyc.Service):
         """
         Make remote modules available to the clients, primarily for creating remote objects
 
-        :param module:
-        :param package:
-        :return:
+        :param str module: The module to import in absolute or relative terms (Ex: pkg.mod, ..mod)
+        :param str package: The package which acts as a base for resolving the module (Should be set
+         when relative imports are used)
+        :return: Remote module
         """
         return import_module(module, package)
 
     @classmethod
     def rpyc_version(cls):
         """
-        Return RPyC version of the remote
+        Return RPyC version of the server
+
         :return:
         """
         return rpyc.__version__
@@ -173,10 +188,10 @@ class RpycMemService(rpyc.Service):
     @classmethod
     def _validate_obj_sources(cls, robj, robj_gen):
         """
-        Validate the object sources
+        Validate the object sources. Return False if both robj, robj_gen are set/not-set else True
 
-        :param robj:
-        :param robj_gen:
+        :param robj: The remote object
+        :param robj_gen: The remote object generator
         :return:
         """
         if (robj is cls._DEFAULT and robj_gen is cls._DEFAULT) or \

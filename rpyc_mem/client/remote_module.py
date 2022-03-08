@@ -7,6 +7,11 @@ class RemoteModule:
     """
 
     def __init__(self, rmem_conn):
+        """
+        Initialize RemoteModule with rpyc memory connection
+
+        :param rpyc_mem.connect.RpycMemConnect rmem_conn: Rpyc memory connection
+        """
         self._rmem_conn = rmem_conn
 
     def __getattr__(self, name):
@@ -14,7 +19,7 @@ class RemoteModule:
         Return builtins/modules of 'rpyc memory service' hosts. Search in remote 'builtins'
         before attempting to import 'name' module.
 
-        :param name: Remote builtins/module
+        :param str name: Name of remote builtins/module
         :return:
         """
         # Search in remote builtins

@@ -19,6 +19,17 @@ class RpycMem:
     _DEFAULT = object()
 
     def __init__(self, rmem_conn, unique_key, robj=_DEFAULT, robj_gen=_DEFAULT):
+        """
+        Initialize Rpyc(shared) memory object
+
+        :param rpyc_mem.connect.RpycMemConnect rmem_conn: Rpyc memory connection on which the remote
+         object should be synced
+        :param unique_key: The unique-key for syncing the remote object with Rpyc memory service
+        :param typing.Any robj: The remote object to use for memoization (One among robj, robj_gen
+         should be passed).
+        :param typing.Callable robj_gen: The remote object generator to use for memoization (One among robj,
+         robj_gen should be passed).
+        """
         self._rmem_conn = rmem_conn
         self._unique_key = unique_key
         self._robj = robj
@@ -29,6 +40,11 @@ class RpycMem:
 
     @property
     def _real_obj(self):
+        """
+        The remote object property.
+
+        :return:
+        """
         try:
             return self._rmem_conn.get(self._unique_key)
         except RpycMemSvcError:
@@ -38,8 +54,10 @@ class RpycMem:
         """
         Memoize the remote object against the unique_key
 
-        :param robj:
-        :param robj_gen:
+        :param typing.Any robj: The remote object to use for memoization (One among robj, robj_gen should be
+         passed).
+        :param typing.Callable robj_gen: The remote object generator to use for memoization (One among robj,
+         robj_gen should be passed).
         :return:
         """
         if not self._validate_obj_sources(robj, robj_gen):
@@ -52,7 +70,7 @@ class RpycMem:
 
     def rmem_get(self):
         """
-        Get the remote object against the key
+        Get the remote object against the unique-key
 
         :return:
         """
@@ -62,8 +80,10 @@ class RpycMem:
         """
         Update remote object on RPyC memory service hosts
 
-        :param robj:
-        :param robj_gen:
+        :param typing.Any robj: The remote object to use for update (One among robj, robj_gen should be
+         passed).
+        :param typing.Callable robj_gen: The remote object generator to use for update (One among robj,
+         robj_gen should be passed).
         :return:
         """
         if not self._validate_obj_sources(robj, robj_gen):
@@ -76,7 +96,7 @@ class RpycMem:
 
     def rmem_delete(self):
         """
-        Delete the mapping on RPyC memory service hosts
+        Delete the mapping in RPyC memory service
 
         :return:
         """
@@ -84,7 +104,13 @@ class RpycMem:
 
     @classmethod
     def _validate_obj_sources(cls, robj, robj_gen):
-        """Validate object sources"""
+        """
+        Validate object sources. Return False if both robj, robj_gen are set/not-set else True
+
+        :param typing.Any robj: Remote object
+        :param typing.Callable robj_gen: Remote object generator
+        :return:
+        """
         if (robj is cls._DEFAULT and robj_gen is cls._DEFAULT) or \
                 (robj is not cls._DEFAULT and robj_gen is not cls._DEFAULT):
             return False

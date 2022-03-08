@@ -23,11 +23,11 @@ class RpycMemConnect:
         """
         Initialize RpycMemConnect object
 
-        :param hostname: RPyC memory service hostname
-        :param port: RPyC memory service port
-        :param max_retry: Number of times to retry upon connection failure.
-        :param retry_delay: Retry delay between each re-connect attempt
-        :param ignore_version: Do not validate the server RPyC version with the client
+        :param str hostname: RPyC memory service hostname
+        :param int port: RPyC memory service port
+        :param int max_retry: Number of times to retry upon connection failure.
+        :param int retry_delay: Retry delay in seconds between each re-connect attempt
+        :param bool ignore_version: Do not validate the server RPyC version with the client
         """
         self._hostname = hostname
         self._port = port
@@ -52,7 +52,12 @@ class RpycMemConnect:
                 )
 
     def close(self):
-        """Close underlying RPyC connection"""
+        """
+        Close underlying RPyC connection. Exceptions are no more handled (until re-setup) after
+        this operation.
+
+        :return:
+        """
         try:
             self._rmem_conn.close()
         except EOFError:
@@ -63,14 +68,14 @@ class RpycMemConnect:
     def rmem_except_handler(self, rmem_fn=None, on_reconnect=None):
         """
         Function decorator for handling rpyc memory service related exceptions. Can be invoked as follows:
-        | 1. @rmem_except_handler -> sets on_reconnect to None
-        | 2. @rmem_except_handler(on_reconnect=reconnect_hook) -> sets on_reconnect to reconnect_hook
-        | 3. @rmem_except_handler() -> Same as @rmem_except_handler
-        | 4. @rmem_except_handler(func) -> Ambiguous case, breaks the code.
+            | + @rmem_except_handler -> sets on_reconnect to None
+            | + @rmem_except_handler(on_reconnect=reconnect_hook) -> sets on_reconnect to reconnect_hook
+            | + @rmem_except_handler() -> Same as @rmem_except_handler
+            | + @rmem_except_handler(func) -> Ambiguous case, breaks the code.
 
         :param rmem_fn: Function to be wrapped
         :param on_reconnect: Reconnect hook to be called when connection is re-established
-        :return:
+        :return: Wrapped function
         """
         def fn_decorator(fn):
             def wrapped_fn(*args, **kwargs):
@@ -110,8 +115,11 @@ class RpycMemConnect:
             return fn_decorator
 
     def _setup_rmem_conn(self):
-        """Setup RPyC memory connection"""
+        """
+        Setup RPyC memory connection
 
+        :return:
+        """
         # Try closing stagnant connection
         try:
             self._rmem_conn.close()
@@ -136,7 +144,14 @@ class RpycMemConnect:
             self._setup_rmem_conn()
 
     def __getattr__(self, name):
-        """Expose attributes of _rmem_conn"""
+        """
+        Search an undefined attribute in underlying rpyc connection object ('_rmem_conn').
+        The attributes of rpyc memory service are directly searched in '_rmem_conn.root'.
+        Example: 'rmem_connect.get', 'rmem_connect.root.get' are similar
+
+        :param str name: The name of attribute to search in underlying rpyc memory connection.
+        :return:
+        """
         @self.rmem_except_handler
         def fn():
             if name in self._ROOT_ATTRS:
