@@ -40,7 +40,7 @@ class RpycMemConnect:
         self._retry = 0
         self._is_closed = False
 
-        self._setup_rmem_conn()
+        self.setup_rmem_conn()
 
         # Verify client version with the server version
         if not ignore_version:
@@ -86,7 +86,7 @@ class RpycMemConnect:
                 # Initiate rpyc memory connection setup if _rmem_conn is empty
                 just_now = False
                 if not self._rmem_conn:
-                    self._setup_rmem_conn()
+                    self.setup_rmem_conn()
                     just_now = True
 
                 try:
@@ -96,7 +96,7 @@ class RpycMemConnect:
                         raise self._RMEM_CONN_ERROR
 
                     # Retry for once after setting up connection freshly
-                    self._setup_rmem_conn()
+                    self.setup_rmem_conn()
 
                     if on_reconnect:
                         # Call on_reconnect hook for special handling
@@ -114,7 +114,7 @@ class RpycMemConnect:
         else:
             return fn_decorator
 
-    def _setup_rmem_conn(self):
+    def setup_rmem_conn(self):
         """
         Setup RPyC memory connection
 
@@ -141,7 +141,7 @@ class RpycMemConnect:
 
             # Retry connection setup after sleep
             time.sleep(self._retry_delay)
-            self._setup_rmem_conn()
+            self.setup_rmem_conn()
 
     def __getattr__(self, name):
         """
