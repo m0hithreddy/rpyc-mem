@@ -10,3 +10,6 @@ venv
 build
 dist
 *.egg-info
+
+# Sphinx Excludes
+docs/_build
