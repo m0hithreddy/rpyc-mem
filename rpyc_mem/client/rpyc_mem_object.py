@@ -23,6 +23,8 @@ class RpycMem:
      should be passed).
     :param typing.Callable robj_gen: The remote object generator to use for memoization (One among robj,
      robj_gen should be passed).
+
+     .. autoproperty:: _real_obj
     """
     _DEFAULT = object()
 

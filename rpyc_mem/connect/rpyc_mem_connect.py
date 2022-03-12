@@ -9,14 +9,16 @@ from rpyc_mem.errors import RpycMemConnError
 
 class RpycMemConnect:
     """
-    Wrapper around rpyc.connect to connect with 'RpycMemService'. RpycMemConnect does some basic
-    error recovery and validations on behalf of the user.
+    Wrapper around ``rpyc.connect`` to connect with ``RpycMemService``. ``RpycMemConnect``
+    does some basic error recovery and validations on behalf of the user.
 
     :param str hostname: RPyC memory service hostname
     :param int port: RPyC memory service port
     :param int max_retry: Number of times to retry upon connection failure.
     :param int retry_delay: Retry delay in seconds between each re-connect attempt
     :param bool ignore_version: Do not validate the server RPyC version with the client
+
+    .. automethod:: __getattr__
     """
 
     _ROOT_ATTRS = [
@@ -143,9 +145,9 @@ class RpycMemConnect:
 
     def __getattr__(self, name):
         """
-        Search an undefined attribute in underlying rpyc connection object ('_rmem_conn').
-        The attributes of rpyc memory service are directly searched in '_rmem_conn.root'.
-        Example: 'rmem_connect.get', 'rmem_connect.root.get' are similar
+        Search an undefined attribute in underlying rpyc connection object (``_rmem_conn``).
+        The attributes of rpyc memory service are directly searched in ``_rmem_conn.root``.
+        Example: ``rmem_connect.get``, ``rmem_connect.root.get`` are similar
 
         :param str name: The name of attribute to search in underlying rpyc memory connection.
         :return:

@@ -13,15 +13,16 @@ class RpycMemService(rpyc.Service):
     """
     RPyC memory service provides functionality to create named and unnamed python objects on remote
     hosts (one which runs this service). The remote objects are created using remote modules (see
-    remote_import). By default all objects created are unnamed, they can be mapped against unique_key
-    to make them named. named objects can be managed using unique_key. This service is intended to be
-    run with 'rpyc.server.ThreadingServer' to maintain one snapshot of the memory
+    ``remote_import``). By default all objects created are unnamed, they can be mapped against
+    unique_key to make them named. named objects can be managed using unique_key. This service is
+    intended to be run with ``rpyc.utils.server.ThreadingServer`` or variants of it to maintain one
+    snapshot of the memory
 
-    :param str hostname: Hostname on which the service is run. Runs on '0.0.0.0' by default.
-    :param int port: Port on which the service is run. Picks a random by default. Can be queried back
-     with 'self._server_obj.port'
-    :param args: Left for rpyc during Service initialization
-    :param kwargs: Left for rpyc during Service initialization
+    :param str hostname: Hostname on which the service is run. Runs on ``0.0.0.0`` by default.
+    :param int port: Port on which the service is run. Picks a random by default. Can be queried
+     back with ``self._server_obj.port`` (this is available only when the service is ran).
+    :param args: Left for ``RPyC`` during ``Service`` initialization
+    :param kwargs: Left for ``RPyC`` during ``Service`` initialization
     """
 
     _ALLOWED_GET_ATTRS = [
@@ -43,12 +44,12 @@ class RpycMemService(rpyc.Service):
 
     def run(self, server=None, server_kwargs=None):
         """
-        Run the RPyC memory service. The host and port used are picked from the __init__ configuration.
-        By default ThreadingServer is used, however this can be altered by passing different 'server' and
-        associated 'server_kwargs'.
+        Run the RPyC memory service. The ``host`` and ``port`` used are picked from the ``__init__``
+        configuration. By default ``ThreadingServer`` is used, however this can be altered by
+        passing different ``server`` and associated ``server_kwargs``.
 
-        :param server:
-        :param server_kwargs:
+        :param server: The server to use for running the service.
+        :param server_kwargs: Update the default server arguments with these.
         :return:
         """
         if not server:
@@ -77,15 +78,15 @@ class RpycMemService(rpyc.Service):
     @classmethod
     def memoize(cls, unique_key, robj=_DEFAULT, robj_gen=_DEFAULT):
         """
-        Memoize the mapping with remote object or remote object returned by the generator against
+        Memoize the mapping of remote object or remote object returned by the generator against
         the unique_key
 
         :param unique_key: The unique_key for creating/querying the mapping
-        :param typing.Any robj: The remote object for memoization (One among robj, robj_gen should be
-         passed)
-        :param typing.Callable robj_gen: The remote object generator for memoization (One among robj,
-         robj_gen should be passed)
-        :return:
+        :param typing.Any robj: The remote object for memoization (One among ``robj``, ``robj_gen``
+         should be passed)
+        :param typing.Callable robj_gen: The remote object generator for memoization (One among ``robj``,
+         ``robj_gen`` should be passed)
+        :return: The memoized object
         """
         if not cls._validate_obj_sources(robj, robj_gen):
             raise RpycMemSvcError('Either object or object generator should be passed')
@@ -105,7 +106,7 @@ class RpycMemService(rpyc.Service):
         Get the remote object against the unique_key. Raise an exception if the mapping is not present
 
         :param unique_key: The unique_key for querying the mapping
-        :return:
+        :return: The memoized object
         """
         with cls._memoize_lock:
             if unique_key not in cls._sharedmem:
@@ -120,10 +121,11 @@ class RpycMemService(rpyc.Service):
         the unique_key (create new mapping if it doesnt exist)
 
         :param unique_key: The unique_key for updating the mapping
-        :param typing.Any robj: The remote object for update (One among robj, robj_gen should be passed)
-        :param typing.Callable robj_gen: The remote object generator for update (One among robj, robj_gen
-         should be passed)
-        :return:
+        :param typing.Any robj: The remote object for update (One among ``robj``, ``robj_gen`` should
+         be passed)
+        :param typing.Callable robj_gen: The remote object generator for update (One among ``robj``,
+         ``robj_gen`` should be passed)
+        :return: The updated object
         """
         if not cls._validate_obj_sources(robj, robj_gen):
             raise RpycMemSvcError('Either object or object generator should be passed')
@@ -154,7 +156,7 @@ class RpycMemService(rpyc.Service):
     @classmethod
     def is_memoized(cls, unique_key):
         """
-        Return True if a mapping exists against the unique_key
+        Return ``True`` if a mapping exists against the unique_key
 
         :param unique_key: The unique_key for querying the mapping
         :return:
@@ -168,7 +170,7 @@ class RpycMemService(rpyc.Service):
         Make remote modules available to the clients, primarily for creating remote objects
 
         :param str module: The module to import in absolute or relative terms (Ex: pkg.mod, ..mod)
-        :param str package: The package which acts as a base for resolving the module (Should be set
+        :param str package: The package which acts as a base for resolving the module (should be set
          when relative imports are used)
         :return: Remote module
         """
@@ -177,7 +179,7 @@ class RpycMemService(rpyc.Service):
     @classmethod
     def rpyc_version(cls):
         """
-        Return RPyC version of the server
+        Return ``RPyC`` version of the server
 
         :return:
         """
