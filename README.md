@@ -58,4 +58,4 @@
    print(rm)    # [1, 2, 3]
    ```
 
-4. For more details, check out the [API-Reference, User-Guide]()
+4. For more details, check out the [API-Reference, User-Guide](http://rpyc-mem.readthedocs.io/)
