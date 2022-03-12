@@ -11,6 +11,7 @@ Welcome to RPyC-Mem's documentation!
    :caption: Contents:
 
    api/modules
+   user_guide/user_guide
 
 
 Indices and tables
