@@ -89,7 +89,7 @@ class RpycMem:
         if not self._validate_obj_sources(robj, robj_gen):
             raise RpycMemError('Either remote object or remote object generator should be passed')
 
-        if self.robj is not self._DEFAULT:
+        if robj is not self._DEFAULT:
             return self._rmem_conn.update(self._unique_key, robj=robj)
         else:
             return self._rmem_conn.update(self._unique_key, robj_gen=robj_gen)
