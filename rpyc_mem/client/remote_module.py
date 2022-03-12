@@ -4,14 +4,12 @@
 class RemoteModule:
     """
     Expose remote modules to create remote python objects
+
+    :param rpyc_mem.connect.RpycMemConnect rmem_conn: Rpyc memory connection
     """
 
     def __init__(self, rmem_conn):
-        """
-        Initialize RemoteModule with rpyc memory connection
-
-        :param rpyc_mem.connect.RpycMemConnect rmem_conn: Rpyc memory connection
-        """
+        """Initialize RemoteModule with rpyc memory connection"""
         self._rmem_conn = rmem_conn
 
     def __getattr__(self, name):

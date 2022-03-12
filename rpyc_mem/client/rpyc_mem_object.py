@@ -15,28 +15,26 @@ rpyc.core.vinegar._generic_exceptions_cache['rpyc_mem.errors.RpycMemSvcError'] =
 class RpycMem:
     """
     Proxy class for python objects residing on RPyC memory service hosts
+
+    :param rpyc_mem.connect.RpycMemConnect rmem_conn: Rpyc memory connection on which the remote
+     object should be synced
+    :param unique_key: The unique-key for syncing the remote object with Rpyc memory service
+    :param typing.Any robj: The remote object to use for memoization (One among robj, robj_gen
+     should be passed).
+    :param typing.Callable robj_gen: The remote object generator to use for memoization (One among robj,
+     robj_gen should be passed).
     """
     _DEFAULT = object()
 
     def __init__(self, rmem_conn, unique_key, robj=_DEFAULT, robj_gen=_DEFAULT):
-        """
-        Initialize Rpyc(shared) memory object
-
-        :param rpyc_mem.connect.RpycMemConnect rmem_conn: Rpyc memory connection on which the remote
-         object should be synced
-        :param unique_key: The unique-key for syncing the remote object with Rpyc memory service
-        :param typing.Any robj: The remote object to use for memoization (One among robj, robj_gen
-         should be passed).
-        :param typing.Callable robj_gen: The remote object generator to use for memoization (One among robj,
-         robj_gen should be passed).
-        """
+        """Initialize Rpyc(shared) memory object"""
         self._rmem_conn = rmem_conn
         self._unique_key = unique_key
         self._robj = robj
         self._robj_gen = robj_gen
 
         # Memoize remote object
-        self.rmem_memoize(robj, robj_gen)
+        self.rmem_memoize(robj, robj_gen)   # noqa
 
     @property
     def _real_obj(self):

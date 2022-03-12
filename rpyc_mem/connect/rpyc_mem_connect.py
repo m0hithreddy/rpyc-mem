@@ -11,6 +11,12 @@ class RpycMemConnect:
     """
     Wrapper around rpyc.connect to connect with 'RpycMemService'. RpycMemConnect does some basic
     error recovery and validations on behalf of the user.
+
+    :param str hostname: RPyC memory service hostname
+    :param int port: RPyC memory service port
+    :param int max_retry: Number of times to retry upon connection failure.
+    :param int retry_delay: Retry delay in seconds between each re-connect attempt
+    :param bool ignore_version: Do not validate the server RPyC version with the client
     """
 
     _ROOT_ATTRS = [
@@ -20,15 +26,7 @@ class RpycMemConnect:
     _RMEM_CONN_ERROR = RpycMemConnError('Unable to connect to RPyC memory service')
 
     def __init__(self, hostname, port, max_retry=4, retry_delay=3, ignore_version=False):
-        """
-        Initialize RpycMemConnect object
-
-        :param str hostname: RPyC memory service hostname
-        :param int port: RPyC memory service port
-        :param int max_retry: Number of times to retry upon connection failure.
-        :param int retry_delay: Retry delay in seconds between each re-connect attempt
-        :param bool ignore_version: Do not validate the server RPyC version with the client
-        """
+        """Initialize RpycMemConnect object"""
         self._hostname = hostname
         self._port = port
         self._max_retry = max_retry

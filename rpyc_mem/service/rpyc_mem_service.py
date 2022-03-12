@@ -16,6 +16,12 @@ class RpycMemService(rpyc.Service):
     remote_import). By default all objects created are unnamed, they can be mapped against unique_key
     to make them named. named objects can be managed using unique_key. This service is intended to be
     run with 'rpyc.server.ThreadingServer' to maintain one snapshot of the memory
+
+    :param str hostname: Hostname on which the service is run. Runs on '0.0.0.0' by default.
+    :param int port: Port on which the service is run. Picks a random by default. Can be queried back
+     with 'self._server_obj.port'
+    :param args: Left for rpyc during Service initialization
+    :param kwargs: Left for rpyc during Service initialization
     """
 
     _ALLOWED_GET_ATTRS = [
@@ -28,15 +34,7 @@ class RpycMemService(rpyc.Service):
     _sharedmem = dict()
 
     def __init__(self, hostname=None, port=None, *args, **kwargs):
-        """
-        Initialize Rpyc memory service
-
-        :param str hostname: Hostname on which the service is run. Runs on '0.0.0.0' by default.
-        :param int port: Port on which the service is run. Picks a random by default. Can be queried back
-         with 'self._server_obj.port'
-        :param args: Left for rpyc during Service initialization
-        :param kwargs: Left for rpyc during Service initialization
-        """
+        """Initialize Rpyc memory service"""
         super().__init__(*args, **kwargs)
 
         self._hostname = hostname
