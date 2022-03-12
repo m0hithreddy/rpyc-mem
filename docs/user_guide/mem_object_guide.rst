@@ -121,3 +121,26 @@ are shared instead of the entire class ::
     """
 
 
+The proxy objects of ``RpycMem`` class will behave like the original objects in most of the cases. However, they come
+with few limitations. The object proxying idea is inspired from the Tomer Filiba's `Python recipe <https://code.activestate.com/
+recipes/496741-object-proxying/>`_. Consider the below interactive session::
+
+    >>> from rpyc_mem.connect import RpycMemConnect
+    >>> from rpyc_mem.client import RemoteModule, RpycMem
+
+    >>> rc = RpycMemConnect('localhost', 18813)
+    >>> ro = RemoteModule(rc)
+
+    >>> rm = RpycMem(rc, 'key1', 1)
+    >>> rm = rm + 1 # rm variable is replaced by int and is garbage collected
+    >>> print(rm)
+    2
+    >>> print(type(rm))
+    <class 'int'>
+    >>> rm = RpycMem(rc, 'key1', 1)
+    >>> _ = rm.rmem_update(rm + 1)  # Use rmem_update to update the shared memory object.
+    >>> print(rm)
+    2
+    >>> print(type(rm))
+    <class 'rpyc_mem.client.rpyc_mem_object.RpycMem'>
+
