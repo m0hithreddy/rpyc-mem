@@ -60,7 +60,7 @@ and ``RpycMem`` instead of creating a new connection. ::
     """
 
 
-Till now we are able to create the objects of ``builtins/modules`` that remote has to offer. But often times we
+Till now we are able to create the objects of ``builtins``/``modules`` that remote has to offer. But often times we
 need to share the objects of custom classes. ``RemoteModule`` has no direct way to create such objects since the remote
 is not aware of your class declarations. The way around is to share the attributes (class attributes, in most cases) of
 the class instead of the entire class. In the following code, the attributes ``lock`` and ``obj`` of ``Shared`` class
@@ -86,7 +86,7 @@ are shared instead of the entire class ::
 
         def describe(self):
             with self.lock:
-                print("%s: %s" % (self.title, self.obj))
+                print('%s: %s' % (self.title, self.obj))
 
         @classmethod
         def run(cls):

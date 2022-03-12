@@ -1,8 +1,9 @@
 RPyC Memory Connect
 -------------------
 
-RpycMemConnect is a wrapper around ``rpyc.connect`` to connect with ``RpycMemService``. ``RpycMemConnect`` performs some
-basic error recovery and validations. ::
+``RpycMemConnect`` is a wrapper around `rpyc.connect <https://rpyc.readthedocs.io/en/latest/api/core_protocol.html#rpyc.
+core.protocol.Connection>`_ to connect with ``RpycMemService``. ``RpycMemConnect`` performs some basic error recovery
+and validations. ::
 
         import rpyc
 
@@ -23,11 +24,11 @@ basic error recovery and validations. ::
         print(rc.is_memoized('not_memoized'))    # False
 
 
-``RPyC`` warns against having different versions for client and server; when the ``ignore_version`` is ``False``, having
-different versions will raise an exception during ``__init__``. The attributes that are not defined by ``RpycMemConnect``
-are searched in the underlying RPyC connection object, Ex: ``rc.root`` will invoke ``getattr(self._rmem_conn, 'root')``.
-The ``RpycMemService`` attributes can be accessed as if they were defined under ``RpycMemConnect`` namespace, Ex:
-``rc.memoize == rc.root.memoize``
+``RPyC`` `warns <https://rpyc.readthedocs.io/en/latest/install.html#cross-interpreter-compatibility>`_ against having
+different versions for client and server; when the ``ignore_version`` is ``False``, having different versions will raise
+an exception during ``__init__``. The attributes that are not defined by ``RpycMemConnect`` are searched in the underlying
+RPyC connection object, Ex: ``rc.root`` will invoke ``getattr(self._rmem_conn, 'root')``. The ``RpycMemService``
+attributes can be accessed as if they were defined under ``RpycMemConnect`` namespace, Ex: ``rc.memoize == rc.root.memoize``
 
 ``RpycMemConnect`` performs some basic error recovery as configured by ``max_retry`` and ``retry_delay``. If you want to
 bypass this you can work with raw connection object ``rc._rmem_conn``. ``RpycMemConnect`` has these additional attributes:

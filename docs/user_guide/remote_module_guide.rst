@@ -1,7 +1,7 @@
 Remote Module
 ---------------
 
-Remote Module invokes ``remote_import`` of ``RpycMemService`` to provide access to remote modules for creating remote
+``RemoteModule`` invokes ``remote_import`` of ``RpycMemService`` to provide access to remote modules for creating remote
 objects. The objects of the client machine can not be shared with other clients as they come with no guarantee on their
 longevity. Moreover, ``RPyC`` internals does not support that either. ``RemoteModule`` accepts the ``RpycMemConnect``
 object for creating remote objects. ::
@@ -42,6 +42,6 @@ object for creating remote objects. ::
     """
 
 
-As part of the module resolution, ``RemoteModule`` first searches in the builtins of remote (``ro.list == ro.builtins.list``),
-if not resolved then tries to (remote) import the package. Remote generators are simply the callables that return remote
-objects created with ``RemoteModule``.
+As part of the module resolution, ``RemoteModule`` first searches in the ``builtins`` of remote (``ro.list == ro.builtins.
+list``), if not resolved then tries to (remote) import the package. Remote generators are simply the callables that return
+remote objects created with ``RemoteModule``.
