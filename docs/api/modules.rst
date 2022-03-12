@@ -1,5 +1,5 @@
-rpyc-mem
-========
+API Reference
+=============
 
 .. toctree::
    :maxdepth: 4

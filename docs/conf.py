@@ -14,6 +14,7 @@ import os
 import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from rpyc_mem import __version__    # noqa
 
 # -- Project information -----------------------------------------------------
 
@@ -23,7 +24,6 @@ author = 'Mohith Reddy'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -42,6 +42,7 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+version = __version__
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -49,6 +50,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
+
+autodoc_member_order = 'bysource'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
