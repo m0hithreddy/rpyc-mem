@@ -28,9 +28,9 @@ class RemoteModule:
 
         return self._rmem_conn
 
-    def __call__(self, module=None, package=None):
+    def __call__(self, module='builtins', package=None):
         """
-        Return the ``modules`` of rpyc memory service hosts. If module is ``None`` assume ``builtins``.
+        Return ``modules`` of rpyc memory service hosts.
 
         :param str module: The module to import in absolute or relative terms (Ex: pkg.mod, ..mod).
          Defaults to ``builtins``.
@@ -39,7 +39,4 @@ class RemoteModule:
 
         :return:
         """
-        if not module:
-            module = 'builtins'
-
         return self.rmem_conn.remote_import(module, package)
