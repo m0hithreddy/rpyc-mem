@@ -16,13 +16,15 @@ class RpycMem:
     """
     Proxy class for python objects residing on RPyC memory service hosts
 
-    :param Union[rpyc_mem.connect.RpycMemConnect, typing.Callable] rmem_conn: Rpyc memory connection (or
-     connection callable) on which the remote object should be synced
-    :param unique_key: The unique-key for syncing the remote object with Rpyc memory service
-    :param typing.Any robj: The remote object to use for memoization (One among robj, robj_gen
-     should be passed).
-    :param typing.Callable robj_gen: The remote object generator to use for memoization (One among robj,
+    :param Union[rpyc_mem.connect.RpycMemConnect, typing.Callable] rmem_conn: Rpyc memory
+     connection or a callable that returns Rpyc memory connection on which the remote object
+     should be synced
+    :param typing.Hashable unique_key: The unique-key for syncing the remote object with
+     Rpyc memory service
+    :param typing.Any robj: The remote object to use for memoization (One among robj,
      robj_gen should be passed).
+    :param typing.Callable robj_gen: The remote object generator to use for memoization
+     (One among robj, robj_gen should be passed).
     """
     _DEFAULT = object()
 
@@ -39,8 +41,8 @@ class RpycMem:
     @property
     def rmem_conn(self):
         """
-        Return the Rpyc memory connection from ``_rmem_conn`` object. If ``_rmem_conn`` is callable
-        return the result of ``_rmem_conn`` invocation else ``_rmem_conn``.
+        Return the Rpyc memory connection from ``_rmem_conn`` object. If ``_rmem_conn`` is
+        callable return the result of ``_rmem_conn`` invocation else ``_rmem_conn``.
 
         :return:
         """
@@ -62,10 +64,11 @@ class RpycMem:
         """
         Memoize the remote object against the unique_key
 
-        :param typing.Any robj: The remote object to use for memoization (One among robj, robj_gen should be
-         passed).
-        :param typing.Callable robj_gen: The remote object generator to use for memoization (One among robj,
+        :param typing.Any robj: The remote object to use for memoization (One among robj,
          robj_gen should be passed).
+        :param typing.Callable robj_gen: The remote object generator to use for memoization
+         (One among robj, robj_gen should be passed).
+
         :return:
         """
         if not self._validate_obj_sources(robj, robj_gen):
@@ -91,10 +94,11 @@ class RpycMem:
         """
         Update remote object on RPyC memory service hosts
 
-        :param typing.Any robj: The remote object to use for update (One among robj, robj_gen should be
-         passed).
-        :param typing.Callable robj_gen: The remote object generator to use for update (One among robj,
-         robj_gen should be passed).
+        :param typing.Any robj: The remote object to use for update (One among robj, robj_gen
+         should be passed).
+        :param typing.Callable robj_gen: The remote object generator to use for update (One
+         among robj, robj_gen should be passed).
+
         :return:
         """
         if not self._validate_obj_sources(robj, robj_gen):
@@ -120,6 +124,7 @@ class RpycMem:
 
         :param typing.Any robj: Remote object
         :param typing.Callable robj_gen: Remote object generator
+
         :return:
         """
         if (robj is cls._DEFAULT and robj_gen is cls._DEFAULT) or \
