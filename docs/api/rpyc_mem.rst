@@ -10,6 +10,7 @@ Subpackages
    rpyc_mem.service
    rpyc_mem.connect
    rpyc_mem.client
+   rpyc_mem.session
    rpyc_mem.utils
 
 Submodules
