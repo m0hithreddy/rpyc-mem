@@ -29,16 +29,16 @@ class RpycMemConnect:
 
     def __init__(self, hostname, port, max_retry=4, retry_delay=3, ignore_version=False):
         """Initialize RpycMemConnect object"""
-        self._hostname = hostname
-        self._port = port
-        self._max_retry = max_retry
-        self._retry_delay = retry_delay
-        self._ignore_version = ignore_version
+        self.hostname = hostname
+        self.port = port
+        self.max_retry = max_retry
+        self.retry_delay = retry_delay
+        self.ignore_version = ignore_version
 
         # Setup connection with RPyC memory service
-        self._rmem_conn = None
+        self.is_closed = False
+        self.rpyc_conn = None
         self._retry = 0
-        self._is_closed = False
 
         self.setup_rmem_conn()
 
@@ -59,11 +59,11 @@ class RpycMemConnect:
         :return:
         """
         try:
-            self._rmem_conn.close()
+            self.rpyc_conn.close()
         except EOFError:
             pass
 
-        self._is_closed = True
+        self.is_closed = True
 
     def rmem_except_handler(self, rmem_fn=None, on_reconnect=None):
         """
@@ -80,12 +80,12 @@ class RpycMemConnect:
         def fn_decorator(fn):
             def wrapped_fn(*args, **kwargs):
                 # If connection is closed by calling close() dont handle any exceptions
-                if self._is_closed:
+                if self.is_closed:
                     return fn(*args, **kwargs)
 
-                # Initiate rpyc memory connection setup if _rmem_conn is empty
+                # Initiate rpyc memory connection setup if rpyc_conn is empty
                 just_now = False
-                if not self._rmem_conn:
+                if not self.rpyc_conn:
                     self.setup_rmem_conn()
                     just_now = True
 
@@ -122,31 +122,31 @@ class RpycMemConnect:
         """
         # Try closing stagnant connection
         try:
-            self._rmem_conn.close()
+            self.rpyc_conn.close()
         except:  # noqa
             pass
 
         try:
-            self._rmem_conn = rpyc.connect(self._hostname, self._port)
-            self._is_closed = False
+            self.rpyc_conn = rpyc.connect(self.hostname, self.port)
+            self.is_closed = False
             self._retry = 0
         except:  # noqa
             # Reset retry if exceeded max_retry (For this attempt of connection setup)
-            if self._retry > self._max_retry:
+            if self._retry > self.max_retry:
                 self._retry = 0
 
             self._retry = self._retry + 1
-            if self._retry > self._max_retry:
+            if self._retry > self.max_retry:
                 raise self._RMEM_CONN_ERROR
 
             # Retry connection setup after sleep
-            time.sleep(self._retry_delay)
+            time.sleep(self.retry_delay)
             self.setup_rmem_conn()
 
     def __getattr__(self, name):
         """
-        Search an undefined attribute in underlying rpyc connection object (``_rmem_conn``).
-        The attributes of rpyc memory service are directly searched in ``_rmem_conn.root``.
+        Search an undefined attribute in underlying rpyc connection object (``rpyc_conn``).
+        The attributes of rpyc memory service are directly searched in ``rpyc_conn.root``.
         Example: ``rmem_connect.get``, ``rmem_connect.root.get`` are similar
 
         :param str name: The name of attribute to search in underlying rpyc memory connection.
@@ -155,8 +155,8 @@ class RpycMemConnect:
         @self.rmem_except_handler
         def fn():
             if name in self._ROOT_ATTRS:
-                return getattr(self._rmem_conn.root, name)
+                return getattr(self.rpyc_conn.root, name)
 
-            return getattr(self._rmem_conn, name)
+            return getattr(self.rpyc_conn, name)
 
         return fn()
