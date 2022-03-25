@@ -23,8 +23,8 @@ class RpycMemSession:
     :param int max_retry: Number of times to retry upon connection failure (at session level).
     :param int retry_delay: Retry delay in seconds between each re-connect attempt
     :param bool ignore_version: Do not validate the server RPyC version with the client
-    :param bool process_safe: Create a new Rpyc Mem connection when the session object is
-     accessed by the process who is not the actual creator of the session.
+    :param bool process_safe: Create a new Rpyc Mem connection when the objects created by the
+     session are accessed by the process who is not the actual creator of the session.
     """
     _DEFAULT = object()
 
