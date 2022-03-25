@@ -15,8 +15,8 @@ class RpycMemSession:
     (underlying socket object is similar) when used in different processes may result in race
     conditions (Refer https://github.com/tomerfiliba-org/rpyc/issues/482). ``RpycMemSession``
     can deal with it by keeping track of processes. ``RpycMemSession`` has functionality for
-    creating ``RemoteModule`` object (singleton) and ``RpycMem`` objects. The underlying Rpyc
-    Mem connection can be retrieved through ``rmem_conn`` property.
+    creating ``RemoteModule`` object (singleton, accessible via ``rmod``) and ``RpycMem`` objects.
+    The underlying Rpyc Mem connection can be retrieved through ``rmem_conn`` property.
 
     :param str hostname: RPyC memory service hostname
     :param int port: RPyC memory service port
@@ -39,8 +39,9 @@ class RpycMemSession:
         self.process_safe = process_safe
 
         self._rmem_conn = None
-        self._rmod = None
         self._process = multiprocessing.current_process().pid
+
+        self.rmod = RemoteModule(self._callable_rmem_conn)
 
     @property
     def rmem_conn(self):
@@ -72,18 +73,6 @@ class RpycMemSession:
     def _callable_rmem_conn(self):
         """Callable wrapper around rmem_conn"""
         return self.rmem_conn
-
-    @property
-    def rmod(self):
-        """
-        Return RemoteModule (singleton) which uses session's rpyc memory connection.
-
-        :return:
-        """
-        if not self._rmod:
-            self._rmod = RemoteModule(self._callable_rmem_conn)
-
-        return self._rmod
 
     def rmem(self, unique_key, robj=_DEFAULT, robj_gen=_DEFAULT):
         """
