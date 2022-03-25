@@ -58,7 +58,10 @@ class RpycMem:
 
         :return:
         """
-        return self.rmem_get()
+        try:
+            return self.rmem_get()
+        except RpycMemSvcError:
+            raise RpycMemError('Can not recover remote object from RPyC memory service')
 
     def rmem_memoize(self, robj=_DEFAULT, robj_gen=_DEFAULT):
         """
@@ -85,10 +88,7 @@ class RpycMem:
 
         :return:
         """
-        try:
-            return self.rmem_conn.get(self.unique_key)
-        except RpycMemSvcError:
-            raise RpycMemError('Can not recover remote object from RPyC memory service')
+        return self.rmem_conn.get(self.unique_key)
 
     def rmem_update(self, robj=_DEFAULT, robj_gen=_DEFAULT):
         """
