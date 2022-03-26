@@ -136,7 +136,7 @@ the cases. However, they come with few limitations. Consider the below interacti
     >>> rc = RpycMemConnect('localhost', 18813)
 
     >>> rm = RpycMem(rc, 'key', 1)
-    >>> rm = rm + 1 # rm variable is replaced by int and is garbage collected
+    >>> rm = rm + 1 # rm variable is replaced by int and the proxy object is garbage collected
     >>> print(rm)
     2
     >>> print(type(rm))
