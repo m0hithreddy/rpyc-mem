@@ -18,10 +18,10 @@ and ``RpycMem`` instead of creating a new connection. ::
         print('Child Process:')
 
         rc = RpycMemConnect('localhost', 18813)
-        ro = RemoteModule(rc)
+        rp = RemoteModule(rc)
 
         # Generators allow delayed execution (dont create if mapping already exists)
-        rm = RpycMem(rc, unique_key, robj_gen=lambda: ro.list([1, 2, 3]))
+        rm = RpycMem(rc, unique_key, robj_gen=lambda: rp().list([1, 2, 3]))
         print(rm)
         rm.append(3)
 
@@ -32,9 +32,9 @@ and ``RpycMem`` instead of creating a new connection. ::
 
     # Assuming service is running on localhost:18813
     rc = RpycMemConnect('localhost', 18813)
-    ro = RemoteModule(rc)
+    rp = RemoteModule(rc)
 
-    rm = RpycMem(rc, 'unique-key', ro.list([1, 2])) # Either pass robj or robj_gen
+    rm = RpycMem(rc, 'unique-key', rp().list([1, 2])) # Either pass robj or robj_gen
 
     print(rm)
     print(len(rm))  # Python special method lookup
@@ -74,12 +74,12 @@ are shared instead of the entire class ::
 
     # Assuming service is running on localhost:18813
     rc = RpycMemConnect('localhost', 18813)
-    ro = RemoteModule(rc)
+    rp = RemoteModule(rc)
 
 
     class Shared:
-        lock = RpycMem(rc, 'lock-key', robj_gen=lambda: ro.threading.Lock())
-        obj = RpycMem(rc, 'obj-key', robj_gen=lambda: ro.list([1, 2]))
+        lock = RpycMem(rc, 'lock-key', robj_gen=lambda: rp('threading').Lock())
+        obj = RpycMem(rc, 'obj-key', robj_gen=lambda: rp().list([1, 2]))
 
         def __init__(self, title):
             self.title = title
@@ -93,7 +93,7 @@ are shared instead of the entire class ::
             with cls.lock:
                 if isinstance(cls.obj, list):
                     print(cls.obj)
-                    cls.obj.rmem_update(ro.tuple([1, 2]))
+                    cls.obj.rmem_update(rp().tuple([1, 2]))
                 else:
                     print('Oops')
 
@@ -120,19 +120,23 @@ are shared instead of the entire class ::
     Oops
     """
 
+Setting the ``multiprocessing`` start method to ``spawn`` is important on Unix based systems (On Windows and MacOs
+``spawn`` is the default start method) because this causes the file to be reimported, which will create a fresh
+RPyC connection. Otherwise two processes will talk to the server from a similar socket object (socket address), which
+will compromise the data integrity on the server side. However, one can rely on ``RpycMemSession`` and forget about
+the connections being reused in different processes. Refer to ``RPyC Memory Session`` guide for more information.
 
-The proxy objects of ``RpycMem`` class will behave like the original objects in most of the cases. However, they come
-with few limitations. The object proxying idea is inspired from the Tomer Filiba's `Python recipe <https://code.activestate.com/
-recipes/496741-object-proxying/>`_. Consider the below interactive session::
+The object proxying idea is inspired from the Tomer Filiba's `Python recipe <https://code.activestate.com/recipes/
+496741-object-proxying/>`_. The proxy objects of ``RpycMem`` class will behave like the original objects in most of
+the cases. However, they come with few limitations. Consider the below interactive session::
 
     >>> from rpyc_mem.connect import RpycMemConnect
-    >>> from rpyc_mem.client import RemoteModule, RpycMem
+    >>> from rpyc_mem.client import RpycMem
 
     >>> rc = RpycMemConnect('localhost', 18813)
-    >>> ro = RemoteModule(rc)
 
-    >>> rm = RpycMem(rc, 'key1', 1)
-    >>> rm = rm + 1 # rm variable is replaced by int and is garbage collected
+    >>> rm = RpycMem(rc, 'key', 1)
+    >>> rm = rm + 1 # rm variable is replaced by int and the proxy object is garbage collected
     >>> print(rm)
     2
     >>> print(type(rm))

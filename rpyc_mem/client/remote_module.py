@@ -5,28 +5,38 @@ class RemoteModule:
     """
     Expose remote modules to create remote python objects
 
-    :param rpyc_mem.connect.RpycMemConnect rmem_conn: Rpyc memory connection
+    :param Union[rpyc_mem.connect.RpycMemConnect, typing.Callable] rmem_conn: Rpyc memory connection
+     or a callable that returns Rpyc memory connection
 
-    .. automethod:: __getattr__
+    .. automethod:: __call__
     """
 
     def __init__(self, rmem_conn):
         """Initialize RemoteModule with rpyc memory connection"""
         self._rmem_conn = rmem_conn
 
-    def __getattr__(self, name):
+    @property
+    def rmem_conn(self):
         """
-        Return ``builtins``/``modules`` of rpyc memory service hosts. Search in remote
-        ``builtins`` before attempting to import ``name`` module.
+        Return the Rpyc memory connection from ``_rmem_conn`` object. If ``_rmem_conn`` is
+        callable return the result of ``_rmem_conn`` invocation else ``_rmem_conn``.
 
-        :param str name: Name of the remote builtins/module
         :return:
         """
-        # Search in remote builtins
-        try:
-            return getattr(self._rmem_conn.remote_import('builtins'), name)
-        except AttributeError:
-            pass
+        if callable(self._rmem_conn):
+            return self._rmem_conn()
 
-        # Import 'name' module from rmem host
-        return self._rmem_conn.remote_import(name)
+        return self._rmem_conn
+
+    def __call__(self, module='builtins', package=None):
+        """
+        Return ``modules`` of rpyc memory service hosts.
+
+        :param str module: The module to import in absolute or relative terms (Ex: pkg.mod, ..mod).
+         Defaults to ``builtins``.
+        :param str package: The package which acts as a base for resolving the module (should be set
+         when relative imports are used)
+
+        :return:
+        """
+        return self.rmem_conn.remote_import(module, package)

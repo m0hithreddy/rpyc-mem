@@ -31,7 +31,7 @@ kwargs used to run the server can be updated by passing ``server_kwargs`` argume
 
 
 Refer to `RPyC documentation <https://rpyc.readthedocs.io/en/latest/api/utils_server.html>`_ for the servers that come
-inbuilt. If the port is left out, a random port is assigned which can be accessed through ``self._server_obj.port``
+inbuilt. If the port is left out, a random port is assigned which can be accessed through ``self.server_obj.port``
 (this is available only after the service is ran).
 
 In the background, ``RpycMemService`` maintains a mapping between the key and the object in a dict. All management

@@ -8,3 +8,4 @@ User Guide
    mem_connect_guide
    remote_module_guide
    mem_object_guide
+   mem_session_guide

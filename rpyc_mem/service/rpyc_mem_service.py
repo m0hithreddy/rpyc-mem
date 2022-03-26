@@ -20,7 +20,7 @@ class RpycMemService(rpyc.Service):
 
     :param str hostname: Hostname on which the service is run. Runs on ``0.0.0.0`` by default.
     :param int port: Port on which the service is run. Picks a random by default. Can be queried
-     back with ``self._server_obj.port`` (this is available only when the service is ran).
+     back with ``self.server_obj.port`` (this is available only when the service is ran).
     :param args: Left for ``RPyC`` during ``Service`` initialization
     :param kwargs: Left for ``RPyC`` during ``Service`` initialization
     """
@@ -31,16 +31,16 @@ class RpycMemService(rpyc.Service):
     ]
     _DEFAULT = object()
 
-    _memoize_lock = threading.Lock()
+    _shm_lock = threading.Lock()
     _sharedmem = dict()
 
     def __init__(self, hostname=None, port=None, *args, **kwargs):
         """Initialize Rpyc memory service"""
         super().__init__(*args, **kwargs)
 
-        self._hostname = hostname
-        self._port = port
-        self._server_obj = None
+        self.hostname = hostname
+        self.port = port
+        self.server_obj = None
 
     def run(self, server=None, server_kwargs=None):
         """
@@ -63,17 +63,17 @@ class RpycMemService(rpyc.Service):
                 'allow_delattr': True
             }
         }
-        if self._hostname:
-            kwargs['hostname'] = self._hostname
+        if self.hostname:
+            kwargs['hostname'] = self.hostname
 
-        if self._port:
-            kwargs['port'] = self._port
+        if self.port:
+            kwargs['port'] = self.port
 
         if server_kwargs:
             kwargs.update(server_kwargs)
 
-        self._server_obj = server(**kwargs)
-        self._server_obj.start()
+        self.server_obj = server(**kwargs)
+        self.server_obj.start()
 
     @classmethod
     def memoize(cls, unique_key, robj=_DEFAULT, robj_gen=_DEFAULT):
@@ -91,7 +91,7 @@ class RpycMemService(rpyc.Service):
         if not cls._validate_obj_sources(robj, robj_gen):
             raise RpycMemSvcError('Either object or object generator should be passed')
 
-        with cls._memoize_lock:
+        with cls._shm_lock:
             if unique_key not in cls._sharedmem:
                 if robj is not cls._DEFAULT:
                     cls._sharedmem[unique_key] = robj
@@ -108,7 +108,7 @@ class RpycMemService(rpyc.Service):
         :param unique_key: The unique_key for querying the mapping
         :return: The memoized object
         """
-        with cls._memoize_lock:
+        with cls._shm_lock:
             if unique_key not in cls._sharedmem:
                 raise RpycMemSvcError('No remote object exists against the key')
 
@@ -130,7 +130,7 @@ class RpycMemService(rpyc.Service):
         if not cls._validate_obj_sources(robj, robj_gen):
             raise RpycMemSvcError('Either object or object generator should be passed')
 
-        with cls._memoize_lock:
+        with cls._shm_lock:
             if robj is not cls._DEFAULT:
                 cls._sharedmem[unique_key] = robj
             else:
@@ -147,7 +147,7 @@ class RpycMemService(rpyc.Service):
         :return:
         """
 
-        with cls._memoize_lock:
+        with cls._shm_lock:
             if unique_key not in cls._sharedmem:
                 raise RpycMemSvcError('No remote object exists against the key')
 
@@ -161,7 +161,7 @@ class RpycMemService(rpyc.Service):
         :param unique_key: The unique_key for querying the mapping
         :return:
         """
-        with cls._memoize_lock:
+        with cls._shm_lock:
             return unique_key in cls._sharedmem
 
     @classmethod

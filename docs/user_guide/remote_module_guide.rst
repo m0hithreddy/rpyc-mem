@@ -12,9 +12,9 @@ object for creating remote objects. ::
     # Assuming service running on localhost:18813
     rc = RpycMemConnect('localhost', 18813)
 
-    ro = RemoteModule(rc)
+    rp = RemoteModule(rc)
 
-    rlist = ro.list([1, 2])
+    rlist = rp().list([1, 2])
     for i in rlist:
         print(i)
 
@@ -22,11 +22,11 @@ object for creating remote objects. ::
     print(type(rlist) == type([1]))
     print(type(rlist))
 
-    rlock = ro.threading.Lock()
+    rlock = rp('threading').Lock()
     rlock.acquire()
-
     print(rlock.locked())
     rlock.release()
+
     with rlock:
         print('synchronized operation')
 
@@ -42,6 +42,5 @@ object for creating remote objects. ::
     """
 
 
-As part of the module resolution, ``RemoteModule`` first searches in the ``builtins`` of remote (``ro.list == ro.builtins.
-list``), if not resolved then tries to (remote) import the package. Remote generators are simply the callables that return
-remote objects created with ``RemoteModule``.
+``RemoteModule`` supports `importlib.import_module <https://docs.python.org/3/library/importlib.html#importlib.import_module>`_ 
+style imports. When ``module`` parameter is not passed, ``builtins`` is assumed by default.
