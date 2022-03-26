@@ -27,11 +27,11 @@ and validations. ::
 ``RPyC`` `warns <https://rpyc.readthedocs.io/en/latest/install.html#cross-interpreter-compatibility>`_ against having
 different versions for client and server; when the ``ignore_version`` is ``False``, having different versions will raise
 an exception during ``__init__``. The attributes that are not defined by ``RpycMemConnect`` are searched in the underlying
-RPyC connection object, Ex: ``rc.root`` will invoke ``getattr(self._rmem_conn, 'root')``. The ``RpycMemService``
+RPyC connection object, Ex: ``rc.root`` will invoke ``getattr(self.rpyc_conn, 'root')``. The ``RpycMemService``
 attributes can be accessed as if they were defined under ``RpycMemConnect`` namespace, Ex: ``rc.memoize == rc.root.memoize``
 
 ``RpycMemConnect`` performs some basic error recovery as configured by ``max_retry`` and ``retry_delay``. If you want to
-bypass this you can work with raw connection object ``rc._rmem_conn``. ``RpycMemConnect`` has these additional attributes:
+bypass this you can work with raw connection object ``rc.rpyc_conn``. ``RpycMemConnect`` has these additional attributes:
 
     * ``rc.setup_rmem_conn()`` - Re-setup the connection (attempt-close and open).
     * ``rc.rmem_except_handler()`` - Function decorator for handling the connection errors when working with raw
@@ -48,17 +48,17 @@ The following snippet shows their usage::
 
     # Working with raw connection object
     try:
-        rc._rmem_conn.root.rpyc_version()
+        rc.rpyc_conn.root.rpyc_version()
     except EOFError:
         rc.setup_rmem_conn()    # Re-setup the connection ([attempt] close and open)
-        print(rc._rmem_conn.root.rpyc_version())
+        print(rc.rpyc_conn.root.rpyc_version())
 
     # Recovery from connection failures
-    rc._rmem_conn.close()   # With rc.close() connection errors are no more handled
+    rc.rpyc_conn.close()   # With rc.close() connection errors are no more handled
     print(rc.rpyc_version())
 
     # Using exception handlers when working with raw connection object
-    rc._rmem_conn.close()
+    rc.rpyc_conn.close()
 
     def reconnect_hook():
         print('re-connected')
@@ -66,7 +66,7 @@ The following snippet shows their usage::
     @rc.rmem_except_handler(on_reconnect=reconnect_hook)
     def rmem_fn():
         """Function that uses rpyc connection object"""
-        print(rc._rmem_conn.root.is_memoized('not_memoized'))
+        print(rc.rpyc_conn.root.is_memoized('not_memoized'))
 
     rmem_fn()
 
