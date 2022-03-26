@@ -27,26 +27,29 @@
 3. Share data between processes
    
    *Client 1:*
-   
+
+   Using RPyC Memory Session
+
    ```python
    from rpyc_mem.connect import RpycMemConnect
-   from rpyc_mem.client import RemoteModule, RpycMem
+   from rpyc_mem.session import RpycMemSession
    
-   rc = RpycMemConnect('localhost', 18813)
-   ro = RemoteModule(rc)
-   rm = RpycMem(rc, 'unique-key', robj_gen=lambda: ro.list([1, 2]))
+   rses = RpycMemSession('localhost', 18813)
+   rm = rses.rmem('unique-key', robj_gen=lambda: rses.rmod().list([1, 2]))
    
    print(rm)    # [1, 2]
    ```
    *Client 2:*
    
+   Using underlying RPyC Memory classes
+
    ```python
    from rpyc_mem.connect import RpycMemConnect
    from rpyc_mem.client import RemoteModule, RpycMem
    
    rc = RpycMemConnect('localhost', 18813)
-   ro = RemoteModule(rc)
-   rm = RpycMem(rc, 'unique-key', robj_gen=lambda: ro.list([1, 2, 3]))
+   rp = RemoteModule(rc)
+   rm = RpycMem(rc, 'unique-key', robj_gen=lambda: rp().list([1, 2, 3]))
    
    print(rm)    # [1, 2]
    rm.append(3)
