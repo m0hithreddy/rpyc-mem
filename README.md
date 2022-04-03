@@ -31,7 +31,6 @@
    Using RPyC Memory Session
 
    ```python
-   from rpyc_mem.connect import RpycMemConnect
    from rpyc_mem.session import RpycMemSession
    
    rses = RpycMemSession('localhost', 18813)
