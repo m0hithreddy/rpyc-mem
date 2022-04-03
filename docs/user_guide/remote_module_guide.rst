@@ -3,7 +3,7 @@ Remote Module
 
 ``RemoteModule`` invokes ``remote_import`` of ``RpycMemService`` to provide access to remote modules for creating remote
 objects. The objects of the client machine can not be shared with other clients as they come with no guarantee on their
-longevity. Moreover, ``RPyC`` internals does not support that either. ``RemoteModule`` accepts the ``RpycMemConnect``
+longevity. ``RemoteModule`` accepts the ``RpycMemConnect``
 object for creating remote objects. ::
 
     from rpyc_mem.connect import RpycMemConnect
