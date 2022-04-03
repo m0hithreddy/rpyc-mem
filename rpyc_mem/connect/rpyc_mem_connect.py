@@ -39,6 +39,7 @@ class RpycMemConnect:
         self.is_closed = False
         self.rpyc_conn = None
         self._retry = 0
+        self.wrapped_getattr = None
 
         self.setup_rmem_conn()
 
@@ -152,11 +153,14 @@ class RpycMemConnect:
         :param str name: The name of attribute to search in underlying rpyc memory connection.
         :return:
         """
-        @self.rmem_except_handler
-        def fn():
-            if name in self._ROOT_ATTRS:
-                return getattr(self.rpyc_conn.root, name)
+        if not self.wrapped_getattr:
+            @self.rmem_except_handler
+            def fn(arg):
+                if arg in self._ROOT_ATTRS:
+                    return getattr(self.rpyc_conn.root, arg)
 
-            return getattr(self.rpyc_conn, name)
+                return getattr(self.rpyc_conn, arg)
 
-        return fn()
+            self.wrapped_getattr = fn
+
+        return self.wrapped_getattr(name)
