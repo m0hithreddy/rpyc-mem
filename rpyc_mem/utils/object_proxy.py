@@ -88,6 +88,12 @@ def proxify(real_attr, local_attrs=()):
 
         cls.__hash__ = _hash
 
+        # Handle __bool__
+        def _bool(self):
+            return bool(real_obj(self))
+
+        cls.__bool__ = _bool
+
         # Handle remaining special methods
         def make_special_method(name):
             def special_method(self, *args, **kwargs):
